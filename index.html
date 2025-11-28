@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Young Artist's Gallery</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        header {
+            background-color: #ffffff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+            display: flex;
+            justify-content: center;
+        }
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+        nav a {
+            text-decoration: none;
+            color: #2c3e50;
+            font-weight: 500;
+            font-size: 1.1rem;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        nav a:hover, nav a.active {
+            background-color: #3498db;
+            color: white;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+        .page {
+            display: none;
+        }
+        .page.active {
+            display: block;
+        }
+        /* Home Page Styles */
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+        .artwork {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+        .artwork:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        .artwork img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            display: block;
+        }
+        .artwork-info {
+            padding: 1rem;
+        }
+        .artwork-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 0.3rem;
+        }
+        .artwork-date {
+            font-size: 0.85rem;
+            color: #95a5a6;
+        }
+        /* About Page Styles */
+        .about-content {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .about-content h2 {
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+        }
+        .about-content p {
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+        .profile-img {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 2rem;
+            display: block;
+            border: 5px solid #3498db;
+        }
+        /* Contact Page Styles */
+        .contact-content {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .contact-content h2 {
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+        }
+        .contact-info {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+        .contact-info p {
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+        .email-link {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .email-link:hover {
+            text-decoration: underline;
+        }
+        /* Lightbox Styles */
+        .lightbox {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        .lightbox-content {
+            max-width: 90%;
+            max-height: 90%;
+        }
+        .lightbox-content img {
+            max-width: 100%;
+            max-height: 80vh;
+            display: block;
+            margin: 0 auto;
+        }
+        .lightbox-caption {
+            color: white;
+            text-align: center;
+            padding: 1rem;
+            font-size: 1.2rem;
+        }
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: white;
+            font-size: 40px;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        .close-btn:hover {
+            color: #e74c3c;
+        }
+        .prev, .next {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            color: white;
+            font-size: 50px;
+            cursor: pointer;
+            padding: 16px;
+            user-select: none;
+            transition: color 0.3s;
+        }
+        .prev:hover, .next:hover {
+            color: #3498db;
+        }
+        .prev {
+            left: 20px;
+        }
+        .next {
+            right: 20px;
+        }
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            background-color: #ffffff;
+            margin-top: 2rem;
+        }
+        @media (max-width: 768px) {
+            nav ul {
+                gap: 1rem;
+            }
+            nav a {
+                font-size: 1rem;
+                padding: 0.5rem;
+            }
+            .gallery {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                gap: 1rem;
+            }
+            .profile-img {
+                width: 150px;
+                height: 150px;
+            }
+        }
+        @media (max-width: 480px) {
+            nav ul {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            .gallery {
+                grid-template-columns: 1fr;
+            }
+            .container {
+                padding: 0 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="#home" class="nav-link active" data-page="home">Home</a></li>
+                <li><a href="#about" class="nav-link" data-page="about">About</a></li>
+                <li><a href="#contact" class="nav-link" data-page="contact">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+    <div class="container">
+        <!-- Home Page -->
+        <div id="home" class="page active">
+            <div class="gallery" id="gallery">
+                <!-- Artworks will be generated by JavaScript -->
+            </div>
+
+            <!-- Remark42 Comments -->
+            <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #eee;">
+                <h3 style="text-align: center; margin-bottom: 1.5rem;">Leave a Kind Word for the Young Artist!</h3>
+                <div id="remark42"></div>
+            </div>
+        </div>
+        <!-- About Page -->
+        <div id="about" class="page">
+            <div class="about-content">
+                <img src="https://placehold.co/200x200/3498db/ffffff?text=Artist" alt="Young Artist" class="profile-img">
+                <h2>About Me</h2>
+                <p>Hi! I'm a 10-year-old artist who loves to draw and create new worlds with my imagination...</p>
+                <p>My favorite subjects to draw are space adventures, underwater kingdoms, and magical creatures...</p>
+                <p>When I'm not drawing, I enjoy reading comic books, playing video games, and exploring nature...</p>
+            </div>
+        </div>
+        <!-- Contact Page -->
+        <div id="contact" class="page">
+            <div class="contact-content">
+                <h2>Get in Touch</h2>
+                <div class="contact-info">
+                    <p>Thank you for visiting my art gallery! If you'd like to get in touch...</p>
+                    <p>For inquiries about my artwork or commissions:</p>
+                    <p><a href="mailto:youngartist@example.com" class="email-link">youngartist@example.com</a></p>
+                    <p>Parents and guardians are welcome to contact me through my mom or dad...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="lightbox" id="lightbox">
+        <span class="close-btn" id="close-btn">&times;</span>
+        <a class="prev" id="prev">&#10094;</a>
+        <a class="next" id="next">&#10095;</a>
+        <div class="lightbox-content">
+            <img id="lightbox-img" src="" alt="">
+            <div class="lightbox-caption" id="lightbox-caption"></div>
+        </div>
+    </div>
+    <footer>
+        <p>© 2025 Young Artist's Gallery | All artwork created with imagination and creativity</p>
+    </footer>
+
+    <!-- Remark42 Script -->
+    <script>
+        var remark_config = {
+            host: "http://localhost:8081",
+            site_id: "oleg-art",
+            components: ["embed"]
+        };
+    </script>
+    <script src="http://localhost:8081/web/remark42.js"></script>
+
+    <script>
+        // Все 18 реальных картинок
+        const artworks = [
+            { id: 1,  file: "first_picture.jpg",         title: "First Drawing",           date: "Oct 2025", description: "My very first artwork!" },
+            { id: 2,  file: "second_picture.jpg",        title: "Second Sketch",           date: "Oct 2025", description: "Made with joy" },
+            { id: 3,  file: "third_picture.jpg",         title: "Third Creation",          date: "Oct 2025", description: "Colors and imagination" },
+            { id: 4,  file: "breakfast_and_eggs.jpg",    title: "Breakfast & Eggs",        date: "Oct 2025", description: "Tasty morning meal" },
+            { id: 5,  file: "burger_eat.jpg",            title: "Burger Time",             date: "Oct 2025", description: "Yummy burger!" },
+            { id: 6,  file: "capibara_and_juice.jpg",    title: "Capibara & Juice",        date: "Oct 2025", description: "Cute animal friend" },
+            { id: 7,  file: "coctail_and_ice.jpg",       title: "Cocktail & Ice",          date: "Oct 2025", description: "Refreshing drink" },
+            { id: 8,  file: "grey_fox.jpg",              title: "Grey Fox",                date: "Oct 2025", description: "Mysterious forest creature" },
+            { id: 9,  file: "hat_and_scare.jpg",         title: "Hat & Scare",             date: "Oct 2025", description: "Spooky fun" },
+            { id: 10, file: "money_rat.jpg",             title: "Money Rat",               date: "Oct 2025", description: "Lucky little rat" },
+            { id: 11, file: "new_year.jpg",              title: "New Year",                date: "Oct 2025", description: "Festive celebration" },
+            { id: 12, file: "osen_duck.jpg",             title: "Autumn Duck",             date: "Oct 2025", description: "Duck in fall leaves" },
+            { id: 13, file: "photo_2025-10-13_14-56-19.jpg", title: "Special Moment",      date: "Oct 2025", description: "A unique snapshot" },
+            { id: 14, file: "python_and_cake.jpg",       title: "Python & Cake",           date: "Oct 2025", description: "Snake with dessert" },
+            { id: 15, file: "shee_with_mushrum.jpg",     title: "Sheep & Mushroom",        date: "Oct 2025", description: "Pastoral scene" },
+            { id: 16, file: "star_sea.jpg",              title: "Star Sea",                date: "Oct 2025", description: "Ocean of stars" },
+            { id: 17, file: "s_dr_otkrutka.jpg",         title: "Screwdriver Drink",       date: "Oct 2025", description: "Creative cocktail" },
+            { id: 18, file: "yellow_dog.jpg",            title: "Yellow Dog",              date: "Oct 2025", description: "Happy pup" }
+        ];
+
+        // Navigation
+        const navLinks = document.querySelectorAll('.nav-link');
+        const pages = document.querySelectorAll('.page');
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                navLinks.forEach(navLink => navLink.classList.remove('active'));
+                link.classList.add('active');
+                const targetPage = link.getAttribute('data-page');
+                pages.forEach(page => {
+                    page.classList.remove('active');
+                    if (page.id === targetPage) {
+                        page.classList.add('active');
+                    }
+                });
+            });
+        });
+
+        // Gallery
+        const gallery = document.getElementById('gallery');
+        artworks.forEach(artwork => {
+            const el = document.createElement('div');
+            el.className = 'artwork';
+            el.dataset.id = artwork.id;
+            el.innerHTML = `
+                <img src="images/${artwork.file}" alt="${artwork.title}">
+                <div class="artwork-info">
+                    <div class="artwork-title">${artwork.title}</div>
+                    <div class="artwork-date">${artwork.date}</div>
+                </div>
+            `;
+            el.addEventListener('click', () => openLightbox(artwork.id));
+            gallery.appendChild(el);
+        });
+
+        // Lightbox
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+        const lightboxCaption = document.getElementById('lightbox-caption');
+        const closeBtn = document.getElementById('close-btn');
+        const prevBtn = document.getElementById('prev');
+        const nextBtn = document.getElementById('next');
+        let currentArtworkId = 1;
+
+        function openLightbox(id) {
+            currentArtworkId = id;
+            const artwork = artworks.find(a => a.id === id);
+            lightboxImg.src = `images/${artwork.file}`;
+            lightboxImg.alt = artwork.title;
+            lightboxCaption.textContent = `${artwork.title} - ${artwork.description} (${artwork.date})`;
+            lightbox.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox() {
+            lightbox.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        function showPrev() {
+            currentArtworkId = currentArtworkId > 1 ? currentArtworkId - 1 : artworks.length;
+            openLightbox(currentArtworkId);
+        }
+
+        function showNext() {
+            currentArtworkId = currentArtworkId < artworks.length ? currentArtworkId + 1 : 1;
+            openLightbox(currentArtworkId);
+        }
+
+        closeBtn.addEventListener('click', closeLightbox);
+        prevBtn.addEventListener('click', showPrev);
+        nextBtn.addEventListener('click', showNext);
+        lightbox.addEventListener('click', (e) => {
+            if (e.target === lightbox) closeLightbox();
+        });
+        document.addEventListener('keydown', (e) => {
+            if (lightbox.style.display === 'flex') {
+                if (e.key === 'Escape') closeLightbox();
+                else if (e.key === 'ArrowLeft') showPrev();
+                else if (e.key === 'ArrowRight') showNext();
+            }
+        });
+    </script>
+</body>
+</html>
